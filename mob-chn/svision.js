@@ -8,17 +8,16 @@ function getUrlVars() {
 }
 
 function runMAME(cart, game) {
-    var wantsWASM = 'WebAssembly' in window;
 
-    var wasmjs_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamegb.js";
-    var wasm_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamegb.wasm"
+    var wasmjs_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamesvision_wasm.js";
+    var wasm_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamesvision_wasm.wasm"
 
     var emulator = new Emulator(document.querySelector(".emucanvas"),
         postRun,
-        new JSMESSLoader(JSMESSLoader.driver("megaduck"),
+        new JSMESSLoader(JSMESSLoader.driver("svision"),
             JSMESSLoader.nativeResolution(480, 450),
-            JSMESSLoader.emulatorJS(wantsWASM ? wasmjs_filename : js_filename),
-            JSMESSLoader.emulatorWASM(wantsWASM && wasm_filename),
+            JSMESSLoader.emulatorJS(wasmjs_filename),
+            JSMESSLoader.emulatorWASM(wasm_filename),
             JSMESSLoader.mountFile(game + ".zip",
                 JSMESSLoader.fetchFile("Game File",
                     cart)),
@@ -67,9 +66,12 @@ if (!String.prototype.includes) {
 
 $(document).ready(function () {
     console.log("ready!");
-    var gameBaseUrl = "https://famicn-1255835060.file.myqcloud.com/megaduck-roms/"
+    var gameBaseUrl = "https://famicn-1255835060.file.myqcloud.com/svision-roms/"
     var game = getUrlVars()["game"];
     var cart = gameBaseUrl + game + ".zip"
-
-    runMAME(cart, game);
+    if (screen.width < 600) {
+        sessionStorage.setItem('fallback_page', 'svision_list.html');
+    } else {
+        runMAME(cart, game);
+    }
 });

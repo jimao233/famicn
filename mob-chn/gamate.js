@@ -7,19 +7,26 @@ function getUrlVars() {
     return vars;
 }
 
-function runMAME(cart) {
-
-    var wasmjs_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamepdc.js";
-    var wasm_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamepdc.wasm"
+function runMAME(cart, game) {
+    var wantsWASM = 'WebAssembly' in window;
+    var wasmjs_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamegamate_wasm.js";
+    var wasm_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamegamate_wasm.wasm"
+    var js_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamegamate.js";
+    var bios = "https://dnbwg.cdn.bcebos.com/emularity-common/bios/gamate.zip"
 
     var emulator = new Emulator(document.querySelector(".emucanvas"),
         postRun,
-        new JSMESSLoader(JSMESSLoader.driver("pdc100"),
-            JSMESSLoader.nativeResolution(640, 480),
-            JSMESSLoader.emulatorJS(wasmjs_filename),
-            JSMESSLoader.emulatorWASM(wasm_filename),
-            JSMESSLoader.mountFile("pdc100.zip",
-                JSMESSLoader.fetchFile("System Image", cart))
+        new JSMESSLoader(JSMESSLoader.driver("gamate"),
+            JSMESSLoader.nativeResolution(480, 450),
+            JSMESSLoader.emulatorJS(wantsWASM ? wasmjs_filename : js_filename),
+            JSMESSLoader.emulatorWASM(wantsWASM && wasm_filename),
+            JSMESSLoader.mountFile("gamate.zip",
+                JSMESSLoader.fetchFile("BIOS",
+                    bios)),
+            JSMESSLoader.mountFile(game + ".zip",
+                JSMESSLoader.fetchFile("Game File",
+                    cart)),
+            JSMAMELoader.peripheral("cart", game + ".zip")
         ));
     emulator.start({ waitAfterDownloading: true });
 }
@@ -64,8 +71,12 @@ if (!String.prototype.includes) {
 
 $(document).ready(function () {
     console.log("ready!");
-    var gameBaseUrl = "https://famicn-1255835060.file.myqcloud.com/pdc-roms/"
+    var gameBaseUrl = "https://famicn-1255835060.file.myqcloud.com/gamate-roms/"
     var game = getUrlVars()["game"];
     var cart = gameBaseUrl + game + ".zip"
-    runMAME(cart, game);
+    if (screen.width < 600) {
+        sessionStorage.setItem('fallback_page', 'gamate_list.html');
+    } else {
+        runMAME(cart, game);
+    }
 });

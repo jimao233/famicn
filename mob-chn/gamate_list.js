@@ -2,7 +2,7 @@ var machineList;
 var newMachineList = [];
 var pages = [];
 var loadedPage = 0;
-var platform = "famiclone.html";
+var platform = "gamate.html";
 
 function getUrlVars() {
     var vars = {};
@@ -14,9 +14,6 @@ function getUrlVars() {
 
 function processJson(data) {
     machineList = data;
-    if (screen.width < 600) {
-        machineList = machineList.filter(machine => machine.jsnes)
-    }
     reorderedList = splitArrayByTime(machineList);
 
     var i, j, temparray, chunk = 32;
@@ -37,22 +34,14 @@ function showMachines(machines) {
     for (i = 0; i < machines.length; i++) {
         var machine = machines[i];
         var clone = base.clone();
-        var title = machine.name + " - " + machine.vendor;
+        var title = machine.name + " (" + machine.year + ") - " + machine.vendor;
         var playerlink = platform + "?game=" + encodeURI(machine.id);
-        if (machine.jsnes) {
-            playerlink = "jsnes.html?game=" + encodeURI(machine.id);
-            title = String.fromCodePoint(0x1F4F1) + title;
-        }
 
-        var imagePathNew = "https://famicn-1255835060.file.myqcloud.com/game-image";
-        var imagePathEdu = "https://famicn-1255835060.file.myqcloud.com/edu-cart-image";
-        var imagePathGenesis = "https://famicn-1255835060.file.myqcloud.com/genesis-image";
-        var imageLink = "cart.gif";
+        var imagePathNew = "https://famicn-1255835060.file.myqcloud.com/gamate-images";
+        var imageLink = "gamate_card_blank.jpg";
         if (machine.image) {
             imageLink = machine.image;
             imageLink = imageLink.replace("{{image-path-new}}", imagePathNew);
-            imageLink = imageLink.replace("{{image-path-edu}}", imagePathEdu);
-            imageLink = imageLink.replace("{{image-path-genesis}}", imagePathGenesis);
         }
         if (machine.device) {
             playerlink = playerlink + "&device=" + machine.device;
@@ -108,13 +97,7 @@ function splitArrayByTime(someArray) {
 }
 
 $(document).ready(function () {
-    var menu = getUrlVars()["menu"];
-    if (!menu) {
-        menu = "games.json";
-    } else if (menu.includes("genesis")) {
-        platform = "genesis.html";
-    }
-    $.getJSON(menu, processJson);
+    $.getJSON("gamate.json", processJson);
 });
 
 $(window).scroll(function () {

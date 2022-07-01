@@ -2,7 +2,7 @@ var machineList;
 var newMachineList = [];
 var pages = [];
 var loadedPage = 0;
-var platform = "svision.html";
+var platform = "gbboy.html";
 
 function getUrlVars() {
     var vars = {};
@@ -34,22 +34,15 @@ function showMachines(machines) {
     for (i = 0; i < machines.length; i++) {
         var machine = machines[i];
         var clone = base.clone();
-        var title = machine.name + " (" + machine.year + ")";
-        if (machine.chinese_name) {
-            var title = machine.chinese_name + " (" + machine.year + ")";
-        }
-        if (machine.vendor.length > 0) {
-            title = title + " - " + machine.vendor;
-        }
+        var title = machine.name + " (" + machine.year + ") - " + machine.vendor;
         var playerlink = platform + "?game=" + encodeURI(machine.id);
 
-        var imagePathNew = "https://famicn-1255835060.file.myqcloud.com/svision-images";
-        var imageLink = "cart.gif";
+        var imagePathNew = "https://famicn-1255835060.file.myqcloud.com/gbboy-images";
+        var imageLink = "gbboy_cart_blank.png";
         if (machine.image) {
             imageLink = machine.image;
             imageLink = imageLink.replace("{{image-path-new}}", imagePathNew);
         }
-
         if (machine.device) {
             playerlink = playerlink + "&device=" + machine.device;
         }
@@ -79,7 +72,9 @@ function search() {
     }
     var searchResult = [];
     for (i = 0; i < machineList.length; i++) {
-        var text = machineList[i].name + machineList[i].vendor;
+        var text = machineList[i].name + machineList[i].vendor + machineList[i].id;
+        text = text.toLowerCase();
+        keyword = keyword.toLowerCase();
         if (text.includes(keyword)) {
             searchResult.push(machineList[i]);
         }
@@ -102,7 +97,7 @@ function splitArrayByTime(someArray) {
 }
 
 $(document).ready(function () {
-    $.getJSON("svision.json", processJson);
+    $.getJSON("gbboy.json", processJson);
 });
 
 $(window).scroll(function () {

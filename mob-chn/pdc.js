@@ -7,21 +7,19 @@ function getUrlVars() {
     return vars;
 }
 
-function runMAME(cart, game) {
+function runMAME(cart) {
 
-    var wasmjs_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamesvision_wasm.js";
-    var wasm_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamesvision_wasm.wasm"
+    var wasmjs_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamepdc.js";
+    var wasm_filename = "https://dnbwg.cdn.bcebos.com/emularity-common/emulators/jsmess/mamepdc.wasm"
 
     var emulator = new Emulator(document.querySelector(".emucanvas"),
         postRun,
-        new JSMESSLoader(JSMESSLoader.driver("svision"),
-            JSMESSLoader.nativeResolution(480, 450),
+        new JSMESSLoader(JSMESSLoader.driver("pdc100"),
+            JSMESSLoader.nativeResolution(640, 480),
             JSMESSLoader.emulatorJS(wasmjs_filename),
             JSMESSLoader.emulatorWASM(wasm_filename),
-            JSMESSLoader.mountFile(game + ".zip",
-                JSMESSLoader.fetchFile("Game File",
-                    cart)),
-            JSMAMELoader.peripheral("cart", game + ".zip")
+            JSMESSLoader.mountFile("pdc100.zip",
+                JSMESSLoader.fetchFile("System Image", cart))
         ));
     emulator.start({ waitAfterDownloading: true });
 }
@@ -66,8 +64,12 @@ if (!String.prototype.includes) {
 
 $(document).ready(function () {
     console.log("ready!");
-    var gameBaseUrl = "https://famicn-1255835060.file.myqcloud.com/svision-roms/"
+    var gameBaseUrl = "https://famicn-1255835060.file.myqcloud.com/pdc-roms/"
     var game = getUrlVars()["game"];
     var cart = gameBaseUrl + game + ".zip"
-    runMAME(cart, game);
+    if (screen.width < 600) {
+        sessionStorage.setItem('fallback_page', 'index.html');
+    } else {
+        runMAME(cart, game);
+    }
 });
